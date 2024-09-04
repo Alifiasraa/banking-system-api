@@ -1,0 +1,334 @@
+paths:
+  /transactions:
+    post:
+      tags:
+        - transaction
+      summary: Create a new transaction
+      description: Creates a new transaction between two accounts.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                source_account_id:
+                  type: string
+                  example: "48f26c77-6794-4b83-b453-fa72d2a0e81b"
+                destination_account_id:
+                  type: string
+                  example: "a509c07c-443d-4cca-a0fe-2575737860f0"
+                amount:
+                  type: number
+                  format: float
+                  example: 1000
+              required:
+                - source_account_id
+                - destination_account_id
+                - amount
+      responses:
+        "201":
+          description: Transaction created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "success"
+                  message:
+                    type: string
+                    example: "Transaction created successfully"
+                  transaction:
+                    $ref: "#/components/schemas/TransactionDetail"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              examples:
+                missing_source_account_id:
+                  summary: Source account ID is required
+                  value:
+                    status: "error"
+                    message: "Source account ID is required"
+                missing_destination_account_id:
+                  summary: Destination account ID is required
+                  value:
+                    status: "error"
+                    message: "Destination account ID is required"
+                missing_amount:
+                  summary: Amount is required
+                  value:
+                    status: "error"
+                    message: "Amount is required"
+                invalid_amount_type:
+                  summary: Transaction amount must be a number
+                  value:
+                    status: "error"
+                    message: "Transaction amount must be a number"
+                invalid_amount_value:
+                  summary: Transaction amount must be greater than 0
+                  value:
+                    status: "error"
+                    message: "Transaction amount must be greater than 0"
+                same_account_error:
+                  summary: Source and destination account cannot be the same
+                  value:
+                    status: "error"
+                    message: "Source and destination account cannot be the same"
+                source_account_not_found:
+                  summary: Source account does not exist
+                  value:
+                    status: "error"
+                    message: "Source account does not exist"
+                destination_account_not_found:
+                  summary: Destination account does not exist
+                  value:
+                    status: "error"
+                    message: "Destination account does not exist"
+                insufficient_balance:
+                  summary: Insufficient balance in source account
+                  value:
+                    status: "error"
+                    message: "Insufficient balance in source account"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+
+    get:
+      tags:
+        - transaction
+      summary: Get all transactions
+      description: Retrieves a list of all transactions.
+      responses:
+        "200":
+          description: Transactions retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "success"
+                  message:
+                    type: string
+                    example: "Transactions retrieved successfully"
+                  transactions:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Transactions"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+
+  /transactions/{id}:
+    get:
+      tags:
+        - transaction
+      summary: Retrieve a transaction by ID
+      description: Retrieves a specific transaction by its ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: "e90e05a7-89b8-47bd-813c-d4a9873fca67"
+      responses:
+        "200":
+          description: Transaction retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "success"
+                  message:
+                    type: string
+                    example: "Transaction retrieved successfully"
+                  transaction:
+                    $ref: "#/components/schemas/TransactionDetail"
+        "404":
+          description: Transaction not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransactionNotFoundError"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+
+    delete:
+      tags:
+        - transaction
+      summary: Delete a transaction by ID
+      description: Deletes a transaction by its ID.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: "63d4ca2f-55d5-42f0-b136-69990cba893f"
+      responses:
+        "200":
+          description: Transaction deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "success"
+                  message:
+                    type: string
+                    example: "Transaction deleted successfully"
+        "404":
+          description: Transaction not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransactionNotFoundError"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+
+components:
+  schemas:
+    Transaction:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "63d4ca2f-55d5-42f0-b136-69990cba893f"
+        source_account_id:
+          type: string
+          format: uuid
+          example: "48f26c77-6794-4b83-b453-fa72d2a0e81b"
+        destination_account_id:
+          type: string
+          format: uuid
+          example: "a509c07c-443d-4cca-a0fe-2575737860f0"
+        amount:
+          type: number
+          format: float
+          example: 1000
+
+    Transactions:
+      type: array
+      items:
+        $ref: "#/components/schemas/Transaction"
+      example:
+        - id: "e90e05a7-89b8-47bd-813c-d4a9873fca67"
+          source_account_id: "a509c07c-443d-4cca-a0fe-2575737860f0"
+          destination_account_id: "48f26c77-6794-4b83-b453-fa72d2a0e81b"
+          amount: 50000
+        - id: "9f152cdf-69aa-48ea-82ab-bc2709dccaca"
+          source_account_id: "48f26c77-6794-4b83-b453-fa72d2a0e81b"
+          destination_account_id: "a509c07c-443d-4cca-a0fe-2575737860f0"
+          amount: 30000
+
+    TransactionDetail:
+      allOf:
+        - $ref: "#/components/schemas/Transaction"
+      properties:
+        sourceAccount:
+          type: object
+          properties:
+            bank_name:
+              type: string
+              example: "Bank JAGO"
+            bank_account_number:
+              type: string
+              example: "123456789"
+            balance:
+              type: number
+              format: float
+              example: 30000
+        destinationAccount:
+          type: object
+          properties:
+            bank_name:
+              type: string
+              example: "Bank BNI"
+            bank_account_number:
+              type: string
+              example: "987654321"
+            balance:
+              type: number
+              format: float
+              example: 18000
+
+    TransactionNotFoundError:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "error"
+        message:
+          type: string
+          example: "Transaction not found"
+
+    InternalServerError:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "error"
+        message:
+          type: string
+          example: "An unexpected error occurred"
+
+    UnauthorizedError:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "error"
+        message:
+          type: string
+          example: "No token, authorization denied"
