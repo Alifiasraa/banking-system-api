@@ -20,6 +20,8 @@ const registerUser = async (body) => {
     },
   });
 
+  delete user.password;
+
   return { user, profile };
 };
 
@@ -79,13 +81,6 @@ const getUserById = async (id) => {
           address: true,
         },
       },
-      accounts: {
-        select: {
-          bank_name: true,
-          bank_account_number: true,
-          balance: true,
-        },
-      },
     },
   });
 };
@@ -128,6 +123,8 @@ const updateUserById = async (id, body) => {
       address: body.address,
     },
   });
+
+  delete user.password;
 
   return { user, profile };
 };

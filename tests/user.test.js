@@ -173,7 +173,6 @@ describe("User Controller", () => {
           identity_number: "12345678900",
           address: "bandung",
         },
-        accounts: [],
       });
 
       const res = await request(app)

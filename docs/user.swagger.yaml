@@ -1,0 +1,473 @@
+paths:
+  /register:
+    post:
+      tags:
+        - user
+      summary: Register a new user
+      description: Register a new user with the provided details.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "kazuha"
+                  description: "Name of the user"
+                email:
+                  type: string
+                  format: email
+                  example: "kazuha@example.com"
+                  description: "Email address of the user"
+                password:
+                  type: string
+                  example: "kazuha"
+                  description: "Password for the user account"
+                identity_type:
+                  type: string
+                  example: "KTP"
+                  description: "Type of identity document"
+                identity_number:
+                  type: string
+                  example: "123456"
+                  description: "Identity number"
+                address:
+                  type: string
+                  example: "bandung"
+                  description: "User's address"
+              required:
+                - name
+                - email
+                - password
+                - identity_type
+                - identity_number
+                - address
+      responses:
+        "201":
+          description: Register successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "success"
+                  message:
+                    type: string
+                    example: "Register successfully"
+                  data:
+                    type: object
+                    properties:
+                      user:
+                        $ref: "#/components/schemas/User"
+                      profile:
+                        $ref: "#/components/schemas/Profile"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              examples:
+                email_in_use:
+                  summary: Email already in use
+                  value:
+                    status: "error"
+                    message: "Email is already in use"
+                identity_number_in_use:
+                  summary: Identity number already in use
+                  value:
+                    status: "error"
+                    message: "Identity number is already in use"
+                missing_fields:
+                  summary: Required fields are missing
+                  value:
+                    status: "error"
+                    message: "One or more required fields are missing"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+
+  /login:
+    post:
+      tags:
+        - user
+      summary: Login a user
+      description: Login with the provided email and password to receive a JWT token.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: "kazuha@example.com"
+                  description: "Email address of the user"
+                password:
+                  type: string
+                  example: "kazuha"
+                  description: "Password for the user account"
+              required:
+                - email
+                - password
+      responses:
+        "200":
+          description: Login successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "success"
+                  message:
+                    type: string
+                    example: "Login successfully"
+                  data:
+                    type: object
+                    properties:
+                      token:
+                        type: string
+                        example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+                      user:
+                        $ref: "#/components/schemas/User"
+
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "error"
+                  message:
+                    type: string
+                    example: "Invalid email or password"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+
+  /users:
+    get:
+      tags:
+        - user
+      summary: Get all users
+      description: Retrieve a list of all users.
+      responses:
+        "200":
+          description: Users retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "success"
+                  message:
+                    type: string
+                    example: "Users retrieved successfully"
+                  users:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Users"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+
+  /users/{id}:
+    get:
+      tags:
+        - user
+      summary: Get a user by ID
+      description: Retrieve a specific user by their ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the user to retrieve
+          schema:
+            type: string
+            format: uuid
+            example: "908778e8-badc-4e49-8471-5b6af7d21b7e"
+      responses:
+        "200":
+          description: User retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "success"
+                  message:
+                    type: string
+                    example: "User retrieved successfully"
+                  user:
+                    $ref: "#/components/schemas/User"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserNotFoundError"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+
+    put:
+      tags:
+        - user
+      summary: Update a user by ID
+      description: Update the details of a specific user by their ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the user to update
+          schema:
+            type: string
+            format: uuid
+            example: "908778e8-badc-4e49-8471-5b6af7d21b7e"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "kazuha"
+                  description: "Name of the user"
+                email:
+                  type: string
+                  format: email
+                  example: "kazuha@example.com"
+                  description: "Email address of the user"
+                password:
+                  type: string
+                  example: "kazuha"
+                  description: "Password for the user account"
+                identity_type:
+                  type: string
+                  example: "KTP"
+                  description: "Type of identity document"
+                identity_number:
+                  type: string
+                  example: "123456"
+                  description: "Identity number"
+                address:
+                  type: string
+                  example: "bandung"
+                  description: "User's address"
+              required:
+                - name
+                - email
+      responses:
+        "200":
+          description: User updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "success"
+                  message:
+                    type: string
+                    example: "User updated successfully"
+                  user:
+                    type: object
+                    properties:
+                      user:
+                        $ref: "#/components/schemas/User"
+                      profile:
+                        $ref: "#/components/schemas/Profile"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              examples:
+                email_in_use:
+                  summary: Email already in use
+                  value:
+                    status: "error"
+                    message: "Email is already in use by another user"
+                identity_number_in_use:
+                  summary: Identity number already in use
+                  value:
+                    status: "error"
+                    message: "Identity number is already in use by another user"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserNotFoundError"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+
+    delete:
+      tags:
+        - user
+      summary: Delete a user by ID
+      description: Delete a specific user by their ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the user to delete
+          schema:
+            type: string
+            format: uuid
+            example: "908778e8-badc-4e49-8471-5b6af7d21b7e"
+      responses:
+        "200":
+          description: User deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "success"
+                  message:
+                    type: string
+                    example: "User deleted successfully"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserNotFoundError"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "9dcf205e-a90a-4f97-96bf-dcf2f91cdca8"
+        name:
+          type: string
+          example: "kazuha"
+        email:
+          type: string
+          format: email
+          example: "kazuha@example.com"
+
+    Users:
+      type: array
+      items:
+        $ref: "#/components/schemas/User"
+      example:
+        - id: "9dcf205e-a90a-4f97-96bf-dcf2f91cdca8"
+          name: "kazuha"
+          email: "kazuha@example.com"
+        - id: "908778e8-badc-4e49-8471-5b6af7d21b7e"
+          name: "ganyu"
+          email: "ganyu@example.com"
+
+    Profile:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "6031e579-4f9e-40da-ba11-08c5f91fa8a1"
+        user_id:
+          type: string
+          format: uuid
+          example: "dd1ba554-fa82-4a14-88da-bae682849352"
+        identity_type:
+          type: string
+          example: "KTP"
+        identity_number:
+          type: string
+          example: "123456"
+        address:
+          type: string
+          example: "bandung"
+
+    UserNotFoundError:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "error"
+        message:
+          type: string
+          example: "User not found"
+
+    InternalServerError:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "error"
+        message:
+          type: string
+          example: "An unexpected error occurred"
+
+    UnauthorizedError:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "error"
+        message:
+          type: string
+          example: "No token, authorization denied"
