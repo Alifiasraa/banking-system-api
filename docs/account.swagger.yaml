@@ -60,6 +60,12 @@ paths:
                   message:
                     type: string
                     example: "Invalid input"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError"
         "500":
           description: Internal Server Error
           content:
@@ -92,6 +98,12 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/Accounts"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError"
         "500":
           description: Internal Server Error
           content:
@@ -131,6 +143,12 @@ paths:
                     example: "Account retrieved successfully"
                   account:
                     $ref: "#/components/schemas/AccountWithTransactions"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError"
         "404":
           description: Account not found
           content:
@@ -212,6 +230,12 @@ paths:
                   message:
                     type: string
                     example: "Invalid input"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError"
         "404":
           description: Account not found
           content:
@@ -254,6 +278,12 @@ paths:
                   message:
                     type: string
                     example: "Account deleted successfully"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError"
         "404":
           description: Account not found
           content:
