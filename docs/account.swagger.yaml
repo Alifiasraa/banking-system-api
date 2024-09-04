@@ -1,0 +1,354 @@
+paths:
+  /accounts:
+    post:
+      tags:
+        - account
+      summary: Create a new bank account
+      description: Creates a new bank account for a user.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: string
+                  example: "908778e8-badc-4e49-8471-5b6af7d21b7e"
+                bank_name:
+                  type: string
+                  example: "Bank ABC"
+                bank_account_number:
+                  type: string
+                  example: "1234567890"
+                balance:
+                  type: number
+                  example: 50000
+              required:
+                - user_id
+                - bank_name
+                - bank_account_number
+                - balance
+      responses:
+        "201":
+          description: Account created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "success"
+                  message:
+                    type: string
+                    example: "Account created successfully"
+                  account:
+                    $ref: "#/components/schemas/Account"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "error"
+                  message:
+                    type: string
+                    example: "Invalid input"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+
+    get:
+      tags:
+        - account
+      summary: Get all bank accounts
+      description: Retrieves a list of all bank accounts.
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Accounts retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "success"
+                  message:
+                    type: string
+                    example: "Accounts retrieved successfully"
+                  accounts:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Accounts"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+
+  /accounts/{id}:
+    get:
+      tags:
+        - account
+      summary: Get a bank account by ID
+      description: Retrieves a specific bank account by its ID.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The account ID
+          schema:
+            type: string
+            example: "48f26c77-6794-4b83-b453-fa72d2a0e81b"
+      responses:
+        "200":
+          description: Account retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "success"
+                  message:
+                    type: string
+                    example: "Account retrieved successfully"
+                  account:
+                    $ref: "#/components/schemas/AccountWithTransactions"
+        "404":
+          description: Account not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccountNotFoundError"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+
+    put:
+      tags:
+        - account
+      summary: Update a bank account by ID
+      description: Updates the details of a specific bank account by its ID.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The account ID
+          schema:
+            type: string
+            example: "48f26c77-6794-4b83-b453-fa72d2a0e81b"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: string
+                  example: "908778e8-badc-4e49-8471-5b6af7d21b7e"
+                bank_name:
+                  type: string
+                  example: "Bank BNI"
+                bank_account_number:
+                  type: string
+                  example: "987654321"
+                balance:
+                  type: number
+                  example: 20000
+              required:
+                - user_id
+                - bank_name
+                - bank_account_number
+                - balance
+      responses:
+        "200":
+          description: Account updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "success"
+                  message:
+                    type: string
+                    example: "Account updated successfully"
+                  account:
+                    $ref: "#/components/schemas/Account"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "error"
+                  message:
+                    type: string
+                    example: "Invalid input"
+        "404":
+          description: Account not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccountNotFoundError"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+
+    delete:
+      tags:
+        - account
+      summary: Delete a bank account by ID
+      description: Deletes a specific bank account by its ID.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The account ID
+          schema:
+            type: string
+            example: "48f26c77-6794-4b83-b453-fa72d2a0e81b"
+      responses:
+        "200":
+          description: Account deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "success"
+                  message:
+                    type: string
+                    example: "Account deleted successfully"
+        "404":
+          description: Account not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccountNotFoundError"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Account:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "d908d46d-6527-4ef4-b663-aee365a3b364"
+        user_id:
+          type: string
+          example: "908778e8-badc-4e49-8471-5b6af7d21b7e"
+        bank_name:
+          type: string
+          example: "Bank ABC"
+        bank_account_number:
+          type: string
+          example: "1234567890"
+        balance:
+          type: number
+          example: 50000
+
+    Accounts:
+      type: array
+      items:
+        $ref: "#/components/schemas/Account"
+      example:
+        - id: "d908d46d-6527-4ef4-b663-aee365a3b364"
+          user_id: "908778e8-badc-4e49-8471-5b6af7d21b7e"
+          bank_name: "Bank ABC"
+          bank_account_number: "1234567890"
+          balance: 50000
+        - id: "d908d46d-6527-4ef4-b663-aee365a3b364"
+          user_id: "908778e8-badc-4e49-8471-5b6af7d21b7e"
+          bank_name: "Bank JAGO"
+          bank_account_number: "1234569877"
+          balance: 230000
+
+    AccountWithTransactions:
+      allOf:
+        - $ref: "#/components/schemas/Account"
+      properties:
+        sentTransaction:
+          type: array
+          items:
+            type: object
+        receivedTransaction:
+          type: array
+          items:
+            type: object
+
+    AccountNotFoundError:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "error"
+        message:
+          type: string
+          example: "Account not found"
+
+    InternalServerError:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "error"
+        message:
+          type: string
+          example: "An unexpected error occurred"
+
+    UnauthorizedError:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "error"
+        message:
+          type: string
+          example: "No token, authorization denied"

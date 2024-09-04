@@ -29,7 +29,7 @@ const getAccountById = async (id) => {
 };
 
 const updateAccountById = async (id, reqBody) => {
-  return await prisma.bankAccount.findUnique({
+  return await prisma.bankAccount.update({
     where: {
       id: id,
     },
